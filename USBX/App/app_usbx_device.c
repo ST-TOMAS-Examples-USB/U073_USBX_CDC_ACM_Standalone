@@ -153,7 +153,7 @@ UINT MX_USBX_Device_Init(VOID)
   }
 
   /* USER CODE BEGIN MX_USBX_Device_Init1 */
-
+  USBX_APP_Device_Init();
   /* USER CODE END MX_USBX_Device_Init1 */
 
   return ret;
@@ -290,7 +290,7 @@ static UINT USBD_ChangeFunction(ULONG Device_State)
   }
 
   /* USER CODE BEGIN USBD_ChangeFunction1 */
-  USBX_APP_Device_Init();
+  
   /* USER CODE END USBD_ChangeFunction1 */
 
   return status;
