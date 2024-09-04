@@ -55,13 +55,13 @@ static ULONG cdc_acm_configuration_number;
 static UX_SLAVE_CLASS_CDC_ACM_PARAMETER cdc_acm_parameter;
 
 /* USER CODE BEGIN PV */
-
+extern PCD_HandleTypeDef hpcd_USB_DRD_FS;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 static UINT USBD_ChangeFunction(ULONG Device_State);
 /* USER CODE BEGIN PFP */
-
+VOID USBX_APP_Device_Init(VOID);
 /* USER CODE END PFP */
 
 /**
@@ -290,11 +290,47 @@ static UINT USBD_ChangeFunction(ULONG Device_State)
   }
 
   /* USER CODE BEGIN USBD_ChangeFunction1 */
-
+  USBX_APP_Device_Init();
   /* USER CODE END USBD_ChangeFunction1 */
 
   return status;
 }
 /* USER CODE BEGIN 1 */
+VOID USBX_APP_Device_Init(VOID)
+{
+  /* USER CODE BEGIN USB_Device_Init_PreTreatment_0 */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VDDUSB_ENABLE();
+  /* USER CODE END USB_Device_Init_PreTreatment_0 */
 
+  /* USB_OTG_HS init function */
+  //MX_USB_OTG_FS_PCD_Init();
+
+  /* USER CODE BEGIN USB_Device_Init_PreTreatment_1 */
+  HAL_PCDEx_PMAConfig(&hpcd_USB_DRD_FS , 0x00 , PCD_SNG_BUF, 0x20);
+  HAL_PCDEx_PMAConfig(&hpcd_USB_DRD_FS , 0x80 , PCD_SNG_BUF, 0x60);
+  HAL_PCDEx_PMAConfig(&hpcd_USB_DRD_FS , 0x01 , PCD_SNG_BUF, 0xA0);
+  HAL_PCDEx_PMAConfig(&hpcd_USB_DRD_FS , 0x81 , PCD_SNG_BUF, 0xE0);
+  HAL_PCDEx_PMAConfig(&hpcd_USB_DRD_FS , 0x82 , PCD_SNG_BUF, 0xF0);
+
+  /* USER CODE END USB_Device_Init_PreTreatment_1 */
+
+  /* initialize the device controller driver*/
+  _ux_dcd_stm32_initialize((ULONG)NULL, (ULONG)&hpcd_USB_DRD_FS);
+
+  /* USER CODE BEGIN USB_Device_Init_PostTreatment */
+  HAL_PCD_Start(&hpcd_USB_DRD_FS);
+  /* USER CODE END USB_Device_Init_PostTreatment */
+}
+
+
+/**
+  * @brief MX_USBX_Device_Process
+  *        Run USBX state machine.
+  * @retval None
+  */
+VOID MX_USBX_Device_Process(VOID)
+{
+  ux_device_stack_tasks_run();
+}
 /* USER CODE END 1 */
